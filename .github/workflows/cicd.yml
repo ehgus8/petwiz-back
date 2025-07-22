@@ -132,10 +132,34 @@ jobs:
             echo "config-service or discovery-service not UP after waiting."
             exit 1
 
+  run_redis:
+    name: Run Redis
+    runs-on: ubuntu-latest
+    needs: wait_config_discovery
+    steps:
+      - name: Start Redis on EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            docker network inspect micro-net >/dev/null 2>&1 || docker network create micro-net
+
+            docker pull redis:7.2-alpine
+            docker stop redis || true
+            docker rm redis || true
+
+            # 비밀번호 필요하면 아래 주석 해제하고 ENV 추가:
+            # -e REDIS_PASSWORD=${REDIS_PASSWORD} redis:7.2-alpine redis-server --requirepass ${REDIS_PASSWORD}
+            docker run -d --name redis --network micro-net \
+              -p 6379:6379 \
+              redis:7.2-alpine
+
   build_and_push_others:
     name: Build and Deploy Others/Gateway
     runs-on: ubuntu-latest
-    needs: wait_config_discovery
+    needs: [ wait_config_discovery, run_redis ]
     strategy:
       matrix:
         service: [ hr-service, notice-service, approval-service, gateway-service ]
