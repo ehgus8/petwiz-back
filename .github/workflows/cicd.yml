@@ -65,25 +65,24 @@ jobs:
 
       - name: Push to ECR
         if: steps.changes.outputs.service == 'true'
-        run: |
-          docker push $ECR_REGISTRY/${{ matrix.service }}:latest
+        run: docker push $ECR_REGISTRY/${{ matrix.service }}:latest
 
       - name: Deploy to EC2
         if: steps.changes.outputs.service == 'true'
         uses: appleboy/ssh-action@v1.0.0
         env:
-          CONFIG_SERVICE_DEV_YML: ${{ secrets.CONFIG_SERVICE_DEV_YML }}   # ← 추가
+          CONFIG_SERVICE_DEV_YML: ${{ secrets.CONFIG_SERVICE_DEV_YML }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           envs: ECR_REGISTRY,AWS_REGION,CONFIG_SERVICE_DEV_YML
           script: |
-            if [ "${{ matrix.service }}" = "config-service" ]; then
-              # Secret이 비었는지 먼저 확인
-              [ -z "$CONFIG_SERVICE_DEV_YML" ] && echo "CONFIG_SERVICE_DEV_YML is EMPTY" && exit 1
+            # 네트워크 생성 (없으면)
+            docker network inspect micro-net >/dev/null 2>&1 || docker network create micro-net
 
-              # application-dev.yml 생성 (줄바꿈/특수문자 그대로)
+            if [ "${{ matrix.service }}" = "config-service" ]; then
+              [ -z "$CONFIG_SERVICE_DEV_YML" ] && echo "CONFIG_SERVICE_DEV_YML is EMPTY" && exit 1
               printf '%s' "$CONFIG_SERVICE_DEV_YML" > /home/ubuntu/application-dev.yml
 
               aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
@@ -91,9 +90,8 @@ jobs:
               docker rm config-service || true
               docker pull $ECR_REGISTRY/config-service:latest
 
-              # Spring이 자동으로 /config/*.yml 읽도록 mount + profile만 켬
-              docker run -d --name config-service -p 8888:8888 \
-                -e SPRING_PROFILES_ACTIVE=dev \
+              docker run -d --name config-service --network micro-net \
+                -p 8888:8888 \
                 -v /home/ubuntu/application-dev.yml:/config/application-dev.yml \
                 $ECR_REGISTRY/config-service:latest
 
@@ -102,9 +100,11 @@ jobs:
               docker stop discovery-service || true
               docker rm discovery-service || true
               docker pull $ECR_REGISTRY/discovery-service:latest
-              docker run -d --name discovery-service -p 8761:8761 $ECR_REGISTRY/discovery-service:latest
-            fi
 
+              docker run -d --name discovery-service --network micro-net \
+                -p 8761:8761 \
+                $ECR_REGISTRY/discovery-service:latest
+            fi
 
   wait_config_discovery:
     name: Wait for Config/Discovery Ready
@@ -189,8 +189,7 @@ jobs:
 
       - name: Push to ECR
         if: steps.changes.outputs.service == 'true'
-        run: |
-          docker push $ECR_REGISTRY/${{ matrix.service }}:latest
+        run: docker push $ECR_REGISTRY/${{ matrix.service }}:latest
 
       - name: Deploy to EC2
         if: steps.changes.outputs.service == 'true'
@@ -201,13 +200,18 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           envs: ECR_REGISTRY,AWS_REGION
           script: |
+            docker network inspect micro-net >/dev/null 2>&1 || docker network create micro-net
+
             aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
             docker stop ${{ matrix.service }} || true
             docker rm ${{ matrix.service }} || true
             docker pull $ECR_REGISTRY/${{ matrix.service }}:latest
 
             if [ "${{ matrix.service }}" = "gateway-service" ]; then
-              docker run -d --name gateway-service -p 8000:8000 $ECR_REGISTRY/gateway-service:latest
+              docker run -d --name gateway-service --network micro-net \
+                -p 8000:8000 \
+                $ECR_REGISTRY/gateway-service:latest
             else
-              docker run -d --name ${{ matrix.service }} $ECR_REGISTRY/${{ matrix.service }}:latest
+              docker run -d --name ${{ matrix.service }} --network micro-net \
+                $ECR_REGISTRY/${{ matrix.service }}:latest
             fi
