@@ -88,6 +88,7 @@ jobs:
               aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
               docker stop config-service || true
               docker rm config-service || true
+              docker rmi $ECR_REGISTRY/config-service:latest || true
               docker pull $ECR_REGISTRY/config-service:latest
 
               docker run -d --name config-service --network micro-net \
@@ -99,6 +100,7 @@ jobs:
               aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
               docker stop discovery-service || true
               docker rm discovery-service || true
+              docker rmi $ECR_REGISTRY/discovery-service:latest || true
               docker pull $ECR_REGISTRY/discovery-service:latest
 
               docker run -d --name discovery-service --network micro-net \
@@ -230,6 +232,7 @@ jobs:
             aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
             docker stop ${{ matrix.service }} || true
             docker rm ${{ matrix.service }} || true
+            docker rmi $ECR_REGISTRY/${{ matrix.service }}:latest || true
             docker pull $ECR_REGISTRY/${{ matrix.service }}:latest
 
             if [ "${{ matrix.service }}" = "gateway-service" ]; then
