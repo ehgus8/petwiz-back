@@ -35,7 +35,7 @@ public class SecurityConfig {
 //                    .requestMatchers("/user/list").hasRole("ROLE_ADMIN")
                     .requestMatchers(
 //                            "/hr/employees",
-                            "/hr/employees/*",
+//                            "/hr/employees/*",
                             "/hr/employees/names",
                             "/hr/employees/login",
                             "/hr/employees/password",
