@@ -27,6 +27,7 @@ jobs:
         id: changes
         uses: dorny/paths-filter@v3
         with:
+          base: ${{ github.event.before }}
           filters: |
             service:
               - ${{ matrix.service }}/**
@@ -78,7 +79,6 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           envs: ECR_REGISTRY,AWS_REGION,CONFIG_SERVICE_DEV_YML
           script: |
-            # 네트워크 생성 (없으면)
             docker network inspect micro-net >/dev/null 2>&1 || docker network create micro-net
 
             if [ "${{ matrix.service }}" = "config-service" ]; then
@@ -175,6 +175,7 @@ jobs:
         id: changes
         uses: dorny/paths-filter@v3
         with:
+          base: ${{ github.event.before }}
           filters: |
             service:
               - ${{ matrix.service }}/**
