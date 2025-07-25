@@ -68,6 +68,25 @@ jobs:
         if: steps.changes.outputs.service == 'true'
         run: docker push $ECR_REGISTRY/${{ matrix.service }}:latest
 
+      - name: Delete old images in ECR (keep only latest)
+        if: steps.changes.outputs.service == 'true'
+        run: |
+          REPO_NAME="${{ matrix.service }}"
+          # latest 태그가 아닌 모든 digest 가져오기
+          DIGESTS=$(aws ecr list-images \
+            --repository-name $REPO_NAME \
+            --query 'imageIds[?imageTag!=`latest`].imageDigest' \
+            --output text)
+
+          if [ -n "$DIGESTS" ]; then
+            for digest in $DIGESTS; do
+              echo "Deleting $digest in $REPO_NAME"
+              aws ecr batch-delete-image --repository-name $REPO_NAME --image-ids imageDigest=$digest
+            done
+          else
+            echo "No old images to delete."
+          fi
+
       - name: Deploy to EC2
         if: steps.changes.outputs.service == 'true'
         uses: appleboy/ssh-action@v1.0.0
@@ -217,6 +236,25 @@ jobs:
       - name: Push to ECR
         if: steps.changes.outputs.service == 'true'
         run: docker push $ECR_REGISTRY/${{ matrix.service }}:latest
+
+      - name: Delete old images in ECR (keep only latest)
+        if: steps.changes.outputs.service == 'true'
+        run: |
+          REPO_NAME="${{ matrix.service }}"
+          # latest 태그가 아닌 모든 digest 가져오기
+          DIGESTS=$(aws ecr list-images \
+            --repository-name $REPO_NAME \
+            --query 'imageIds[?imageTag!=`latest`].imageDigest' \
+            --output text)
+
+          if [ -n "$DIGESTS" ]; then
+            for digest in $DIGESTS; do
+              echo "Deleting $digest in $REPO_NAME"
+              aws ecr batch-delete-image --repository-name $REPO_NAME --image-ids imageDigest=$digest
+            done
+          else
+            echo "No old images to delete."
+          fi
 
       - name: Deploy to EC2
         if: steps.changes.outputs.service == 'true'

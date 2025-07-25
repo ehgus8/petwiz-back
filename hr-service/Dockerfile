@@ -1,5 +1,5 @@
-
-FROM openjdk:17-jdk-slim AS build
+# 1단계: 빌드
+FROM openjdk:17-alpine AS build
 
 WORKDIR /app
 COPY . .
@@ -7,9 +7,10 @@ COPY . .
 RUN chmod +x ./gradlew
 RUN ./gradlew clean build -x test
 
-FROM openjdk:17-jdk-slim
+# 2단계: 실행 - JRE만 남기기
+FROM openjdk:17-alpine
 
+WORKDIR /app
 COPY --from=build /app/build/libs/*.jar app.jar
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
-
