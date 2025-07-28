@@ -1,4 +1,4 @@
-#
+
 server:
   port: 8000
 
@@ -12,6 +12,7 @@ spring:
           "[/**]":
             allowed-origins:
               - "http://localhost:5173"
+              - "http://hrhub-bucket-front.s3-website.ap-northeast-2.amazonaws.com"
             allowed-methods:
               - GET
               - POST
