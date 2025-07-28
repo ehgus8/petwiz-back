@@ -2,10 +2,5 @@
 spring:
   profiles:
     active: dev
-management:
-  metrics:
-    enable:
-      system:
-        cpu: false
-        load:
-          average: false
+  autoconfigure:
+    exclude: org.springframework.boot.actuate.autoconfigure.metrics.SystemMetricsAutoConfiguration
