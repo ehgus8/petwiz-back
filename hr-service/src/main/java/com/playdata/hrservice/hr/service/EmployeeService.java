@@ -15,6 +15,7 @@ import com.playdata.hrservice.hr.repository.HrTransferHistoryRepository;
 import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.ws.rs.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -236,6 +237,9 @@ public class EmployeeService {
         Employee employee = employeeRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Employee not found!")
         );
+        if (employee.getRole().equals(Role.ADMIN)) {
+            throw new BadRequestException("어드민 정보는 수정할 수 없습니다!");
+        }
         if (role.equals(Role.ADMIN) || role.equals(Role.HR_MANAGER)) {
             employee.updateRoleAndPosition(Role.valueOf(dto.getRole()), Position.valueOf(dto.getPosition()));
             employee.updateDepartment(departmentService.getDepartmentEntity(dto.getDepartmentId()));
