@@ -6,6 +6,10 @@ spring:
 p6spy:
   config:
     registermbeans: false
+management:
+  metrics:
+    enable:
+      system: false
 
 #  profiles:
 #    active: local
