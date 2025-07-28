@@ -2,15 +2,15 @@
 spring:
   application:
     name: notice
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.actuate.autoconfigure.metrics.SystemMetricsAutoConfiguration
+      - org.springframework.boot.actuate.autoconfigure.metrics.web.tomcat.TomcatMetricsAutoConfiguration
 #  profiles:
 #    active: local
 p6spy:
   config:
     registermbeans: false
-management:
-  metrics:
-    enable:
-      system: false
 
 springdoc:
   api-docs:

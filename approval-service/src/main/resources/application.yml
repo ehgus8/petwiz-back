@@ -4,14 +4,13 @@ spring:
     name: approval
   profiles:
     active: local
-
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.actuate.autoconfigure.metrics.SystemMetricsAutoConfiguration
+      - org.springframework.boot.actuate.autoconfigure.metrics.web.tomcat.TomcatMetricsAutoConfiguration
 p6spy:
   config:
     registermbeans: false
-management:
-  metrics:
-    enable:
-      system: false
 
 
 springdoc:
