@@ -48,8 +48,9 @@ public class CommonExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> exceptionHandler(Exception e) {
         e.printStackTrace();
+        String message = e.getMessage();
         CommonErrorDto errorDto
-                = new CommonErrorDto(HttpStatus.INTERNAL_SERVER_ERROR, "server error");
+                = new CommonErrorDto(HttpStatus.INTERNAL_SERVER_ERROR, message);
         return new ResponseEntity<>(errorDto, HttpStatus.INTERNAL_SERVER_ERROR); // 500 에러
     }
 
