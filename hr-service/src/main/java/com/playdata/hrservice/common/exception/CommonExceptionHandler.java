@@ -3,6 +3,7 @@ package com.playdata.hrservice.common.exception;
 import com.playdata.hrservice.common.dto.CommonErrorDto;
 import com.playdata.hrservice.common.dto.CommonResDto;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.ws.rs.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -44,13 +45,21 @@ public class CommonExceptionHandler {
         return new ResponseEntity<>(errorDto, HttpStatus.FORBIDDEN);
     }
 
+    // 특정 권한을 가지지 못한 사용자가 요청을 보냈을 때 내쫓는 메서드
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<?> badRequestHandler(BadRequestException e) {
+        e.printStackTrace();
+        CommonErrorDto errorDto
+                = new CommonErrorDto(HttpStatus.FORBIDDEN, e.getMessage());
+        return new ResponseEntity<>(errorDto, HttpStatus.FORBIDDEN);
+    }
+
     // 미처 준비하지 못한 타입의 예외가 발생했을 시 처리할 메서드
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> exceptionHandler(Exception e) {
         e.printStackTrace();
-        String message = e.getMessage();
         CommonErrorDto errorDto
-                = new CommonErrorDto(HttpStatus.INTERNAL_SERVER_ERROR, message);
+                = new CommonErrorDto(HttpStatus.INTERNAL_SERVER_ERROR, "server error");
         return new ResponseEntity<>(errorDto, HttpStatus.INTERNAL_SERVER_ERROR); // 500 에러
     }
 
