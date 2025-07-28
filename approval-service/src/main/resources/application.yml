@@ -5,6 +5,11 @@ spring:
   profiles:
     active: local
 
+p6spy:
+  config:
+    registermbeans: false
+
+
 springdoc:
   api-docs:
     path: /v3/api-docs # default value

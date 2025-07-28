@@ -2,5 +2,10 @@
 spring:
   application:
     name: hr
+
+p6spy:
+  config:
+    registermbeans: false
+
 #  profiles:
 #    active: local

@@ -4,6 +4,9 @@ spring:
     name: notice
 #  profiles:
 #    active: local
+p6spy:
+  config:
+    registermbeans: false
 
 springdoc:
   api-docs:
