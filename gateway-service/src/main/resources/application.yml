@@ -1,4 +1,3 @@
-#
 server:
   port: 8000
 
@@ -32,43 +31,40 @@ spring:
       routes:
         - id: hr
           uri: lb://HR
-          # k8s 클러스터 내에서 다른 서비스를 지목하기위한 DNS 명명 규칙.
-          # <service-name>.<namespace>.svc.cluster.local:port
-#          uri: http://user-service.default.svc.cluster.local:8081
           predicates:
-            - Path=/hr/**
+            - Path=/api/hr/**
           filters:
+            - StripPrefix=1
             - AuthorizationHeaderFilter
 
         - id: notice
           uri: lb://NOTICE
-          #          uri: http://user-service.default.svc.cluster.local:8081
           predicates:
-            - Path=/notice/**
+            - Path=/api/notice/**
           filters:
+            - StripPrefix=1
             - AuthorizationHeaderFilter
 
         - id: community
           uri: lb://NOTICE
-          #          uri: http://user-service.default.svc.cluster.local:8081
           predicates:
-            - Path=/community/**
+            - Path=/api/community/**
           filters:
+            - StripPrefix=1
             - AuthorizationHeaderFilter
 
         - id: report
           uri: lb://NOTICE
-          #          uri: http://user-service.default.svc.cluster.local:8081
           predicates:
-            - Path=/report/**
+            - Path=/api/report/**
           filters:
+            - StripPrefix=1
             - AuthorizationHeaderFilter
 
         - id: approval
           uri: lb://APPROVAL
-          #          uri: http://user-service.default.svc.cluster.local:8081
           predicates:
-            - Path=/approval/**
+            - Path=/api/approval/**
           filters:
+            - StripPrefix=1
             - AuthorizationHeaderFilter
-
