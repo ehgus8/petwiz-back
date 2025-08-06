@@ -19,6 +19,7 @@ spring:
               - "https://3.37.254.91"
               - "https://hrhub.cc"
               - "https://www.hrhub.cc"
+              - "http://hrhub.cc.s3-website.ap-northeast-2.amazonaws.com"
             allowed-methods:
               - GET
               - POST
