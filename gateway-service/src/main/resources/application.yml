@@ -20,6 +20,7 @@ spring:
               - "https://hrhub.cc"
               - "https://www.hrhub.cc"
               - "http://hrhub.cc.s3-website.ap-northeast-2.amazonaws.com"
+              - "https://d1b68kg7x7kpwg.cloudfront.net"
             allowed-methods:
               - GET
               - POST
