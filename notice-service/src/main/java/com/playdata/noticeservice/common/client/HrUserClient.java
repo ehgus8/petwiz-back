@@ -36,7 +36,7 @@ public class HrUserClient {
     public HrUserResponse getUserInfo(Long userId) {
         // gateway 주소를 통해 요청 (Eureka 통해 포워딩됨)
         String gatewayUrl = env.getProperty("gateway.url", "http://gateway-service:8000"); // application.properties에서 관리 가능
-        String url = gatewayUrl + "/hr/employees/" + userId;
+        String url = gatewayUrl + "/api/hr/employees/" + userId;
 
         // 🔐 현재 요청에서 Authorization 헤더 가져오기
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
@@ -68,7 +68,7 @@ public class HrUserClient {
         if (userIds == null || userIds.isEmpty()) return List.of();
 
         String gatewayUrl = env.getProperty("gateway.url", "http://gateway-service:8000");
-        String url = gatewayUrl + "/hr/employees/bulk";
+        String url = gatewayUrl + "/api/hr/employees/bulk";
 
 //        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 //        String token = request.getHeader("Authorization");
@@ -109,7 +109,7 @@ public class HrUserClient {
         if (userIds == null || userIds.isEmpty()) return List.of();
 
         String gatewayUrl = env.getProperty("gateway.url", "http://gateway-service:8000");
-        String url = gatewayUrl + "/hr/employees/bulk";
+        String url = gatewayUrl + "/api/hr/employees/bulk";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", token);
